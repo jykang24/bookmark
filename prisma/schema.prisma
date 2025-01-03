@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Book {
+  id      Int     @id @default(autoincrement()) @db.UnsignedInt
+  title   String  @db.VarChar(36)
+  withdel Boolean @default(false)
+  owner   Int     @db.UnsignedMediumInt
+  User    User    @relation(fields: [owner], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "book_ibfk_1")
+  Mark    Mark[]
+
+  @@index([owner], map: "fk_Book_owner_User")
+}
+
+model Mark {
+  id       Int    @id @default(autoincrement()) @db.UnsignedInt
+  book     Int    @db.UnsignedInt
+  url      String @db.VarChar(1024)
+  title    String @db.VarChar(255)
+  image    String @db.VarChar(500)
+  descript String @db.VarChar(1000)
+  Book     Book   @relation(fields: [book], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "mark_ibfk_1")
+
+  @@index([book], map: "fk_Mark_book")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model User {
+  id       Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+  nickname String  @db.VarChar(31)
+  email    String  @unique @db.VarChar(200)
+  passwd   String? @db.VarChar(128)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt @map("updatedate")
+  Book     Book[]
+}
