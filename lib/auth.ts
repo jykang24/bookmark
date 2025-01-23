@@ -48,6 +48,7 @@ export const {
       return true;
     },
     async redirect({ url, baseUrl }) {
+      console.log('redirect:', baseUrl);
       return baseUrl;
     },
     async session({ session, user }) {
@@ -56,7 +57,7 @@ export const {
       //session.user = user
       return session;
     },
-  }, //login하고 나서
+  },
   trustHost: true,
   session: {
     strategy: 'jwt', // JWT를 사용하는지 확인

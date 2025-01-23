@@ -1,7 +1,7 @@
 'use client';
 
+import { myLogin as login } from '@/actions/sign';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from '@/lib/i18n-zod';
 import { Button } from '@/components/ui/button';
@@ -34,16 +34,15 @@ export default function CredentialLogin() {
 
   const onSubmit = async (values: FormSchemaType) => {
     console.log('Credential-login values:', values); //로그인테스트용 콘솔출력
-    //인증절차 signIn필요
-    const result = await signIn('credentials', {
-      email: values.email,
-      password: values.password,
-    });
-
-    if (result?.error) {
-      console.error('Login failed:', result.error);
-    } else {
-      console.log('Login successful');
+    try {
+      const res = await login({
+        email: values.email,
+        password: values.password,
+      });
+      console.log('login result :', res);
+      //window.location.href = '/';
+    } catch (error) {
+      console.error('Error while login :', error);
     }
   };
 

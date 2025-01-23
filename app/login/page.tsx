@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { auth, signIn } from '@/lib/auth';
 import { query } from '@/lib/db';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,11 @@ export default async function Login() {
   const session = await auth();
   console.log('login - session:', session);
   //const users = await query<User>('select * from User');
-
+  if (session && session !== undefined) {
+    //로그인 후 홈으로 리다이렉트
+    console.log('Now Logined, redirect to Home...');
+    redirect('/');
+  }
   const googleLogin = async (formData: FormData) => {
     'use server';
     const service = formData.get('service') as string; //확실할때는 as써도됨
