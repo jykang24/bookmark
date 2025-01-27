@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth, signIn } from '@/lib/auth';
 import { query } from '@/lib/db';
@@ -49,6 +50,8 @@ export default async function Login() {
         <GithubLogin githubLogin={githubLogin}></GithubLogin>
       </form>
       <KakaoLogin />
+
+      <Link href='/signup'>Sign up</Link>
     </>
   );
 }
