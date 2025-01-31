@@ -2,6 +2,7 @@
 
 import { hash } from 'bcrypt';
 import { signIn } from '@/lib/auth';
+import prisma from '@/lib/db';
 
 type Props = {
   email: string;
@@ -26,5 +27,28 @@ export const myLogin = async ({ email, password }: Props) => {
   } catch (err) {
     console.log('myLogin error:', err);
     return null;
+  }
+};
+
+export const insertUser = async ({
+  email,
+  nickname,
+  passwd,
+}: {
+  email: string;
+  nickname: string;
+  passwd: string;
+}) => {
+  try {
+    const user = await prisma.user.create({
+      data: {
+        email,
+        nickname,
+        passwd,
+      },
+    });
+    console.log('insert user into User >>', user);
+  } catch (err) {
+    console.log('insertUser error:', err);
   }
 };
