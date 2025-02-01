@@ -52,3 +52,24 @@ export const insertUser = async ({
     console.log('insertUser error:', err);
   }
 };
+
+export const getUser = async ({ email, password }: Props) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    }); //유저 존재하는지 체크
+
+    if (!user || user.passwd !== password) {
+      //비밀번호 검증
+      console.log('아이디 또는 비밀번호가 틀렸습니다.');
+      return null;
+    }
+    console.log('getUser from DB >>', user);
+    return user;
+  } catch (err) {
+    console.log('getUser error: ', err);
+    return null;
+  }
+};
