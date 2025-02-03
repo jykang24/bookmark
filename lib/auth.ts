@@ -69,7 +69,7 @@ export const {
       console.log('redirect:', baseUrl);
       return baseUrl;
     },
-    jwt({ token, account, profile }) {
+    jwt({ token, account, profile, user }) {
       if (account) {
         console.log('로그인 시도 - account존재:', account);
         token.accessToken = account.access_token;
@@ -77,6 +77,7 @@ export const {
         token.provider = account.provider;
         console.log('로그인 토큰 정보:', token);
         console.log('로그인 사용자 정보:', profile);
+        console.log('로그인 유저 정보:', user);
       } else {
         console.log('세션 유지 - account없음,기존토큰유지');
       }
@@ -91,6 +92,35 @@ export const {
       //TODO: 강제로 session user email 넣어줌, 없으면 사용자이름이 안뜬다..
       session.user.email = '임시이메일';
       return session;
+    },
+  },
+  events: {
+    async signOut(events) {
+      if ('token' in events && events.token) {
+        console.log('로그아웃 이벤트 발생 - token:', events.token);
+        if (events.token.provider === 'kakao') {
+          const response = await fetch(
+            'https://kapi.kakao.com/v1/user/logout',
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${events.token.accessToken}`,
+                //  'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          if (response.ok) {
+            console.log('로그아웃 성공');
+          } else {
+            console.log('로그아웃 실패', await response.text());
+          }
+        }
+      } else {
+        console.log('로그아웃 이벤트 발생 - session만');
+        return;
+      }
     },
   },
   trustHost: true,
