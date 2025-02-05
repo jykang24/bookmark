@@ -6,8 +6,11 @@ export async function middleware(req: NextRequest) {
   const didLogin = !!session?.user;
   const path = req.nextUrl.pathname;
 
-  console.log('session:', session, didLogin);
+  console.log('middle - session:', session);
+  console.log('middle - didLogin:', didLogin);
   if (!didLogin) {
+    console.log('Not logined middle - session:', session);
+    console.log('Not logined middle - didLogin:', didLogin);
     const callbackUrl = encodeURIComponent(path);
 
     return NextResponse.redirect(
@@ -19,6 +22,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|images|api/auth|login|regist|$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|images|api/auth|login|logout|api/regist|signup|samples|$).*)',
   ],
 };

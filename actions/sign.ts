@@ -1,7 +1,7 @@
 'use server';
 
 import { hash } from 'bcrypt';
-import { signIn } from '@/lib/auth';
+import { signIn, signOut } from '@/lib/auth';
 import prisma from '@/lib/db';
 
 type Props = {
@@ -10,6 +10,9 @@ type Props = {
 };
 export const login = async (service: string) => {
   await signIn(service);
+};
+export const logout = async () => {
+  await signOut();
 };
 export async function hashPassword(passwd: string) {
   return hash(passwd, 10);

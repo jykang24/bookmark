@@ -59,6 +59,7 @@ export const {
   ],
   pages: {
     signIn: `/login`,
+    signOut: `/logout`,
   },
   callbacks: {
     // async signIn({ account, profile }) {
@@ -89,6 +90,7 @@ export const {
       console.log('auth token:', token);
       //console.log('auth user:', user); //oauth일때만
       //session.user = user; //세션에 유저정보 저장
+      //if(token?.accessToken) session.accessToken = token.accessToken
       //TODO: 강제로 session user email 넣어줌, 없으면 사용자이름이 안뜬다..
       session.user.email = '임시이메일';
       return session;
@@ -105,14 +107,14 @@ export const {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${events.token.accessToken}`,
-                //  'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
               },
             }
           );
-
+          const data = await response.json();
           if (response.ok) {
             console.log('로그아웃 성공');
+            if (data.id) console.log('로그아웃 유저번호', data.id);
           } else {
             console.log('로그아웃 실패', await response.text());
           }
