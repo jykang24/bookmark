@@ -111,10 +111,10 @@ export const {
               },
             }
           );
-          const data = await response.json();
+          // const data = await response.json();
           if (response.ok) {
             console.log('로그아웃 성공');
-            if (data.id) console.log('로그아웃 유저번호', data.id);
+            //if (data.id) console.log('로그아웃 유저번호', data.id);
           } else {
             console.log('로그아웃 실패', await response.text());
           }
