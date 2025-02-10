@@ -1,10 +1,21 @@
 import { getUser } from '@/actions/sign';
-import NextAuth, { User } from 'next-auth';
+import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Github from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 import Kakao from 'next-auth/providers/kakao';
 import Naver from 'next-auth/providers/naver';
+
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      //session.user의 타입확장
+      provider: string;
+      //accessToken?: string;
+      //refreshToken?: string;
+    } & DefaultSession['user'];
+  }
+}
 
 export const {
   handlers: { GET, POST },
@@ -40,16 +51,12 @@ export const {
             id: user.id.toString(), //number id를 string으로 변환
             name: user.nickname,
             email: user.email,
+            provider: 'credentials',
           };
         } catch (err) {
           console.log('auth - getUsererror:', err);
           return null;
         }
-        // const user = {
-        //   id: '2',
-        //   email: credentials.email,
-        //   name: 'Hong',
-        // } as User; // 임시 - 유저 객체 생성
       },
     }),
     Google,
@@ -71,16 +78,27 @@ export const {
       return baseUrl;
     },
     jwt({ token, account, profile, user }) {
-      if (account) {
-        console.log('로그인 시도 - account존재:', account);
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
-        token.provider = account.provider;
+      if (account || user) {
+        if (!account) {
+          //Credential 로그인
+          console.log('로그인 시도 - credential', user);
+          token.email = user.email;
+          token.provider = 'credentials';
+          token.name = user.name;
+        }
+        if (account) {
+          //Oauth 로그인
+          console.log('로그인 시도 - account존재:', account);
+          token.accessToken = account.access_token;
+          token.refreshToken = account.refresh_token;
+          token.provider = account.provider;
+        }
+
         console.log('로그인 토큰 정보:', token);
         console.log('로그인 사용자 정보:', profile);
         console.log('로그인 유저 정보:', user);
       } else {
-        console.log('세션 유지 - account없음,기존토큰유지');
+        console.log('세션 유지 - account없음, 기존토큰유지');
       }
 
       return token;
@@ -88,19 +106,25 @@ export const {
     async session({ session, token }) {
       console.log('auth session:', session);
       console.log('auth token:', token);
-      //console.log('auth user:', user); //oauth일때만
-      //session.user = user; //세션에 유저정보 저장
-      //if(token?.accessToken) session.accessToken = token.accessToken
       //TODO: 강제로 session user email 넣어줌, 없으면 사용자이름이 안뜬다..
       session.user.email = '임시이메일';
-      return session;
+
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          provider: token.provider,
+        },
+      };
     },
   },
   events: {
     async signOut(events) {
       if ('token' in events && events.token) {
         console.log('로그아웃 이벤트 발생 - token:', events.token);
+
         if (events.token.provider === 'kakao') {
+          //카카오 로그아웃
           const response = await fetch(
             'https://kapi.kakao.com/v1/user/logout',
             {
@@ -111,13 +135,15 @@ export const {
               },
             }
           );
-          // const data = await response.json();
           if (response.ok) {
             console.log('로그아웃 성공');
-            //if (data.id) console.log('로그아웃 유저번호', data.id);
           } else {
             console.log('로그아웃 실패', await response.text());
           }
+        }
+
+        if (events.token.provider === 'credentials') {
+          console.log('credentials 로그아웃');
         }
       } else {
         console.log('로그아웃 이벤트 발생 - session만');
