@@ -1,3 +1,4 @@
+import { Copyright } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import localFont from 'next/font/local';
@@ -33,18 +34,21 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header>
+        <header className='flex justify-between mx-4 text-xl'>
+          <Link href='/'>JY Bookmark</Link>
           <Link href={didLogin ? '/api/auth/signout' : '/api/auth/signin'}>
-            {didLogin ? session.user?.name : 'SignIn'}
+            {didLogin ? session.user?.name : 'Login'}
           </Link>
         </header>
         <div className='grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'>
           <main className='flex flex-col gap-8 row-start-2 items-center sm:items-start'>
             {children}
           </main>
-
-          <footer className='fixed bottom-0'>Bookmark by Jiyeon</footer>
         </div>
+        <footer className='flex gap-1 items-center justify-center'>
+          <Copyright size={16} />
+          Bookmark by Jiyeon
+        </footer>
       </body>
     </html>
   );
