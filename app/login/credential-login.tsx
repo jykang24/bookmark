@@ -2,6 +2,7 @@
 
 import { myLogin as login } from '@/actions/sign';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { LogIn } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from '@/lib/i18n-zod';
 import { Button } from '@/components/ui/button';
@@ -39,8 +40,10 @@ export default function CredentialLogin() {
         email: values.email,
         password: values.password,
       });
+      if (!res) {
+        return alert('아이디 또는 비밀번호가 틀렸습니다.');
+      }
       console.log('login result :', res);
-      //window.location.href = '/';
     } catch (error) {
       console.error('Error while login :', error);
     }
@@ -48,9 +51,9 @@ export default function CredentialLogin() {
 
   return (
     <>
-      <h1 className='text-2xl'>Credential login</h1>
+      <h1 className='text-2xl'></h1>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
           <FormField
             control={form.control}
             name='email'
@@ -70,11 +73,14 @@ export default function CredentialLogin() {
           />
           <FormFieldInput
             form={form}
+            label='password'
             name='password'
             type='password'
             placeholder='password...'
           />
-          <Button type='submit'>Login</Button>
+          <Button type='submit' className='w-full'>
+            Login <LogIn />
+          </Button>
         </form>
       </Form>
     </>

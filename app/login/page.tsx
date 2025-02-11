@@ -1,57 +1,28 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { auth, signIn } from '@/lib/auth';
-import { query } from '@/lib/db';
-import { Button } from '@/components/ui/button';
+import { auth } from '@/lib/auth';
 import CredentialLogin from './credential-login';
-import GithubLogin from './github-login';
-import KakaoLogin from './kakao-login';
-
-type User = {
-  id: number;
-  nickname: string;
-  email: string;
-};
+import OAuthLogin from './oauth-login';
 
 export default async function Login() {
   const session = await auth();
   console.log('login - session:', session);
-  //const users = await query<User>('select * from User');
+
   if (session && session !== undefined) {
     //로그인 후 홈으로 리다이렉트
     console.log('Now Logined, redirect to Home...');
     redirect('/');
   }
-  const googleLogin = async (formData: FormData) => {
-    'use server';
-    const service = formData.get('service') as string; //확실할때는 as써도됨
-    await signIn(service);
-  };
-
-  const githubLogin = async () => {
-    'use server';
-    console.log('****');
-    await signIn('github');
-  };
 
   return (
-    <>
-      <h1 className='text-2xl mb-3 text-center'>Login </h1>
-      <ul>
-        {/* {users.map((user) => (
-          <li key={user.id}>{user.nickname}</li>
-        ))} */}
-      </ul>
+    <div className='flex flex-col gap-8'>
+      <h1 className='flex justify-center text-2xl text-center'>Login</h1>
       <CredentialLogin />
-      <hr />
-      <form action={googleLogin}>
-        <input type='hidden' name='service' value='google' />
-        <Button type='submit'>Sign In with Google</Button>
-        <GithubLogin githubLogin={githubLogin}></GithubLogin>
-      </form>
-      <KakaoLogin />
-
-      <Link href='/signup'>Sign up</Link>
-    </>
+      <OAuthLogin />
+      <div className='w-full h-[1px] border border-black border-dashed'></div>
+      <Link href='/signup' className='text-xl w-full'>
+        Sign up →
+      </Link>
+    </div>
   );
 }
