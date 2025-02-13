@@ -9,9 +9,15 @@ export default async function Login() {
   console.log('login - session:', session);
 
   if (session && session !== undefined) {
+    if (session.user.registRequired) {
+      console.log('가입화면으로 이동');
+      redirect('/signup/agreement');
+    }
     //로그인 후 홈으로 리다이렉트
-    console.log('Now Logined, redirect to Home...');
-    redirect('/');
+    else {
+      console.log('Now Logined, redirect to Home...');
+      redirect('/');
+    }
   }
 
   return (

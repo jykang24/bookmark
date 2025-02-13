@@ -1,4 +1,4 @@
-import { getUser } from '@/actions/sign';
+import { getUser, searchUser } from '@/actions/sign';
 import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Github from 'next-auth/providers/github';
@@ -11,6 +11,7 @@ declare module 'next-auth' {
     user: {
       //session.user의 타입확장
       provider: string;
+      registRequired?: boolean;
       //accessToken?: string;
       //refreshToken?: string;
     } & DefaultSession['user'];
@@ -44,14 +45,16 @@ export const {
           });
 
           if (!user) {
-            return null;
+            throw new Error(
+              '아이디 또는 비밀번호가 틀렸거나 존재하지 않는 사용자입니다.'
+            );
           }
           console.log('authroize user>>', user);
           return {
             id: user.id.toString(), //number id를 string으로 변환
             name: user.nickname,
             email: user.email,
-            provider: 'credentials',
+            provider: user.provider,
           };
         } catch (err) {
           console.log('auth - getUsererror:', err);
@@ -77,21 +80,48 @@ export const {
       console.log('redirect:', baseUrl);
       return baseUrl;
     },
-    jwt({ token, account, profile, user }) {
+    async jwt({ token, account, profile, user }) {
       if (account || user) {
         if (!account) {
-          //Credential 로그인
-          console.log('로그인 시도 - credential', user);
-          token.email = user.email;
-          token.provider = 'credentials';
-          token.name = user.name;
+          console.log('로그인 시도 - no account', user);
+          // token.email = user.email;
+          // token.provider = 'credentials';
+          // token.name = user.name;
         }
         if (account) {
-          //Oauth 로그인
           console.log('로그인 시도 - account존재:', account);
-          token.accessToken = account.access_token;
-          token.refreshToken = account.refresh_token;
-          token.provider = account.provider;
+
+          //TODO:OAUTH 로그인시, 유저존재 여부 확인 로직필요
+          if (account.provider !== 'credentials') {
+            console.log('로그인 시도 - Oauth로그인');
+
+            const email = account.email?.toString() || ' ';
+            console.log('oauth account email -', email);
+
+            const existUser = await searchUser({ email });
+            if (existUser) {
+              //존재하는 유저면 로그인 처리
+              token.accessToken = account?.access_token || '';
+              token.refreshToken = account?.refresh_token || '';
+              token.provider = account.provider;
+            } else {
+              //존재하지 않는 유저면 회원가입 처리
+              console.log(
+                '가입되지 않은 사용자입니다. 회원 가입 페이지로 이동합니다.'
+              );
+              //TODO:QQQ
+              token.accessToken = account?.access_token || '';
+              token.refreshToken = account?.refresh_token || '';
+              token.registRequired = true;
+              token.provider = account.provider;
+            }
+          }
+          //존재하는 유저면 로그인 처리
+          if (account.provider === 'credentials') {
+            token.accessToken = account?.access_token || '';
+            token.refreshToken = account?.refresh_token || '';
+            token.provider = account.provider;
+          }
         }
 
         console.log('로그인 토큰 정보:', token);
@@ -106,8 +136,18 @@ export const {
     async session({ session, token }) {
       console.log('auth session:', session);
       console.log('auth token:', token);
-      //TODO: 강제로 session user email 넣어줌, 없으면 사용자이름이 안뜬다..
-      session.user.email = '임시이메일';
+      session.user.email = token.email || '임시이메일';
+      if (token.registRequired) {
+        //회원가입 필요한 사용자
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            provider: token.provider,
+            registRequired: true,
+          },
+        };
+      }
 
       return {
         ...session,
@@ -124,7 +164,7 @@ export const {
         console.log('로그아웃 이벤트 발생 - token:', events.token);
 
         if (events.token.provider === 'kakao') {
-          //카카오 로그아웃
+          //카카오 로그아웃 (1) 액세스 토큰 무효화 요청
           const response = await fetch(
             'https://kapi.kakao.com/v1/user/logout',
             {
