@@ -1,3 +1,9 @@
+import BookList from '@/components/BookList';
+
 export default function Home() {
-  return <>Main Home</>;
+  return (
+    <>
+      <BookList></BookList>
+    </>
+  );
 }
