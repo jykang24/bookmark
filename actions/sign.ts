@@ -9,7 +9,7 @@ type Props = {
   password: string;
 };
 export const login = async (service: string) => {
-  await signIn(service);
+  await signIn(service, { redirect: false });
 };
 export const logout = async () => {
   await signOut();
@@ -45,21 +45,32 @@ export const insertUser = async ({
 }: {
   email: string;
   nickname: string;
-  passwd: string;
+  passwd?: string;
   provider: string;
 }) => {
   try {
-    //passwd 암호화
-    passwd = await hashPassword(passwd);
-    const user = await prisma.user.create({
-      data: {
-        email,
-        nickname,
-        passwd,
-        provider,
-      },
-    });
-    console.log('insert user into User >>', user);
+    if (provider === 'credentials' && passwd) {
+      //passwd 암호화
+      passwd = await hashPassword(passwd);
+      const user = await prisma.user.create({
+        data: {
+          email,
+          nickname,
+          passwd,
+          provider,
+        },
+      });
+      console.log('insert credential user into User >>', user);
+    } else {
+      const user = await prisma.user.create({
+        data: {
+          email,
+          nickname,
+          provider,
+        },
+      });
+      console.log('insert Oauth user into User >>', user);
+    }
     return true;
   } catch (err) {
     console.log('insertUser error:', err);
@@ -96,15 +107,15 @@ export const getUser = async ({ email, password }: Props) => {
     }); //유저 존재하는지 체크
 
     if (!user) {
-      console.log('아이디 또는 비밀번호가 틀렸습니다.');
-      return false;
+      console.log('아이디 입력오류 또는 존재하지 않는 사용자');
+      return null;
     }
     //비밀번호 검증
     if (user && user.passwd) {
       const res = await compare(password, user.passwd);
       if (!res) {
-        console.log('아이디 또는 비밀번호가 틀렸습니다.');
-        return false;
+        console.log('비밀번호 입력 오류');
+        return null;
       }
     }
     console.log('getUser from DB >>', user);
