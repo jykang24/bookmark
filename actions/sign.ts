@@ -9,7 +9,7 @@ type Props = {
   password: string;
 };
 export const login = async (service: string) => {
-  await signIn(service, { redirect: false });
+  await signIn(service);
 };
 export const logout = async () => {
   await signOut();
@@ -123,5 +123,20 @@ export const getUser = async ({ email, password }: Props) => {
   } catch (err) {
     console.log('getUser error: ', err);
     return null;
+  }
+};
+
+export const deleteUser = async ({ email }: { email: string }) => {
+  try {
+    await prisma.user.delete({
+      where: {
+        email,
+      },
+    });
+    console.log('deleteUser completed');
+    return true;
+  } catch (err) {
+    console.log('deleteUser error: ', err);
+    return false;
   }
 };
