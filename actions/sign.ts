@@ -12,7 +12,7 @@ export const login = async (service: string) => {
   await signIn(service);
 };
 export const logout = async () => {
-  await signOut();
+  await signOut({ redirectTo: '/' });
 };
 export async function hashPassword(passwd: string) {
   return hash(passwd, 10);
@@ -27,6 +27,7 @@ export const myLogin = async ({ email, password }: Props) => {
       email,
       password,
       redirect: false, // 리다이렉션 비활성화
+      callbackUrl: '/',
     });
 
     console.log('myLogin result:', result); //성공시 res로 url을 반환
