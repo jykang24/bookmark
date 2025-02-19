@@ -19,8 +19,7 @@ export default function Agreement() {
         provider,
       });
       console.log('insertUser result-', res);
-      //TODO: update 동작확인후 수정하기
-      await update(); //토큰 및 세션 업데이트
+      await update({ registRequired: false }); //토큰 및 세션 업데이트
       console.log('회원가입이 완료되었습니다.');
     } else {
       console.log('Signup-agree - No session');
