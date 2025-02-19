@@ -1,7 +1,7 @@
 // 'use server'
 import { clsx, type ClassValue } from 'clsx';
-import * as crypto from 'node:crypto';
 import { twMerge } from 'tailwind-merge';
+import { v4 as uuidv4 } from 'uuid';
 import { z } from '@/lib/i18n-zod';
 
 export function cn(...inputs: ClassValue[]) {
@@ -30,5 +30,5 @@ export function parseZodErrorMessage(error: z.ZodError) {
 }
 
 export const generateToken = () => {
-  return crypto.randomBytes(32).toString('hex'); // 랜덤한 문자열 토큰 생성
+  return uuidv4();
 };
