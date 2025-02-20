@@ -5,6 +5,8 @@ import Github from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 import Kakao from 'next-auth/providers/kakao';
 import Naver from 'next-auth/providers/naver';
+import prisma from './db';
+import { generateToken } from './utils';
 
 declare module 'next-auth' {
   interface Session {
@@ -12,8 +14,6 @@ declare module 'next-auth' {
       //session.user의 타입확장
       provider: string;
       registRequired?: boolean;
-      //accessToken?: string;
-      //refreshToken?: string;
     } & DefaultSession['user'];
   }
 }
@@ -76,59 +76,93 @@ export const {
     //   console.log('account', account);
     //   return true;
     // },
-    async redirect({ url, baseUrl }) {
-      console.log('redirect:', baseUrl);
-      return baseUrl;
-    },
-    async jwt({ token, account, profile, user }) {
+    // async redirect({ url, baseUrl }) {
+    //   console.log('redirect:', baseUrl);
+    //   return baseUrl;
+    // },
+    async jwt({ token, account, profile, user, trigger }) {
+      //TODO: isNewUser
       if (account || user) {
         if (!account) {
           console.log('로그인 시도 - no account', user);
-          // token.email = user.email;
-          // token.provider = 'credentials';
-          // token.name = user.name;
         }
         if (account) {
           console.log('로그인 시도 - account존재:', account);
 
-          //TODO:OAUTH 로그인시, 유저존재 여부 확인 로직필요
           if (account.provider !== 'credentials') {
             console.log('로그인 시도 - Oauth로그인');
-
-            const email = account.email?.toString() || ' ';
+            token.email = profile?.email || '임시이메일';
+            const email = token.email;
             console.log('oauth account email -', email);
-
+            //TODO: email 처리필요
             const existUser = await searchUser({ email });
-            if (existUser) {
-              //존재하는 유저면 로그인 처리
-              token.accessToken = account?.access_token || '';
-              token.refreshToken = account?.refresh_token || '';
-              token.provider = account.provider;
-            } else {
-              //존재하지 않는 유저면 회원가입 처리
+            if (!existUser) {
               console.log(
                 '가입되지 않은 사용자입니다. 회원 가입 페이지로 이동합니다.'
               );
-              //TODO:QQQ
-              token.accessToken = account?.access_token || '';
-              token.refreshToken = account?.refresh_token || '';
               token.registRequired = true;
-              token.provider = account.provider;
             }
-          }
-          //존재하는 유저면 로그인 처리
-          if (account.provider === 'credentials') {
             token.accessToken = account?.access_token || '';
             token.refreshToken = account?.refresh_token || '';
-            token.provider = account.provider;
+          } else {
+            console.log('로그인 시도 - credentials로그인');
+            //토큰 최초 발급
+            token.accessToken = Date.now() + 60 * 60 * 24 * 1000; //만료시간 설정(24시간)
+            const refreshToken = generateToken();
+            const refreshTokenExp = new Date(
+              Date.now() + 60 * 60 * 24 * 14 * 1000
+            ); // 만료시간 설정(2주)
+            try {
+              await prisma.user.update({
+                where: {
+                  email: token.email || '임시이메일', //TODO: 수정필요
+                },
+                data: {
+                  refreshToken,
+                  refreshTokenExp,
+                },
+              });
+              console.log('refreshToken saved');
+            } catch (err) {
+              console.log('refreshToken save Error:', err);
+            }
           }
+          token.provider = account.provider;
         }
-
         console.log('로그인 토큰 정보:', token);
-        console.log('로그인 사용자 정보:', profile);
+        console.log('로그인 사용자 프로필 정보:', profile);
         console.log('로그인 유저 정보:', user);
       } else {
         console.log('세션 유지 - account없음, 기존토큰유지');
+
+        if (token.provider === 'credentials') {
+          const currentTime = Date.now();
+          const currentDate = new Date(currentTime);
+          //TODO: accesToken 타입 보완필요
+          if (token.email && (token.accessToken as number) < Date.now()) {
+            //액세스 토큰 만료시 refresh 토큰 체크
+            const user = await prisma.user.findUnique({
+              where: {
+                email: token.email,
+              },
+            });
+            if (
+              user &&
+              user.refreshToken &&
+              user.refreshTokenExp &&
+              user.refreshTokenExp > currentDate
+            ) {
+              token.accessToken = Date.now() + 60 * 60 * 24 * 1000; //refresh유효시 액세스 토큰 갱신
+            } else {
+              //refresh 토큰 만료시 로그아웃 처리필요
+              token.error = 'refreshTokenExpired';
+            }
+          }
+        }
+      }
+
+      if (trigger === 'update') {
+        token.registRequired = false;
       }
 
       return token;
@@ -136,19 +170,22 @@ export const {
     async session({ session, token }) {
       console.log('auth session:', session);
       console.log('auth token:', token);
-      session.user.email = token.email || '임시이메일';
       if (token.registRequired) {
         //회원가입 필요한 사용자
         return {
           ...session,
           user: {
             ...session.user,
+            email: token.email,
             provider: token.provider,
             registRequired: true,
           },
         };
       }
-
+      //TODO: refreshToken만료시 로그아웃 처리 필요
+      // if (token.error) {
+      //   session.user.error = token.error; // 클라이언트에서 로그아웃 처리 가능하도록 전달
+      // }
       return {
         ...session,
         user: {
@@ -184,6 +221,16 @@ export const {
 
         if (events.token.provider === 'credentials') {
           console.log('credentials 로그아웃');
+
+          await prisma.user.update({
+            where: {
+              email: events.token.email || '임시이메일', //TODO: 수정필요
+            },
+            data: {
+              refreshToken: null,
+              refreshTokenExp: null,
+            },
+          });
         }
       } else {
         console.log('로그아웃 이벤트 발생 - session만');
@@ -194,5 +241,6 @@ export const {
   trustHost: true,
   session: {
     strategy: 'jwt', // JWT를 사용하는지 확인
+    maxAge: 60 * 60 * 24 * 14, //토큰 만료시간 설정 (2주)
   },
 });
