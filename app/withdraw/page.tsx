@@ -12,9 +12,8 @@ export default async function Withdraw() {
 
   return (
     <>
-      <h1 className='text-3xl'>회원 탈퇴</h1>
-      {/* TODO:email수정 */}
-      <WithdrawButton email='임시이메일' />
+      <h1 className='text-3xl text-green-500'>Bookmark 서비스 회원 탈퇴</h1>
+      <WithdrawButton email={session.user.email ?? '임시이메일'} />
     </>
   );
 }
