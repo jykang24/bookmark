@@ -27,7 +27,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  const didLogin = !!session?.user?.email;
+  const didLogin = !!session?.user?.name;
   console.log('layout - session:', session);
   return (
     <html lang='en'>
@@ -37,7 +37,7 @@ export default async function RootLayout({
         <header className='flex justify-between mx-4 text-xl'>
           <Link href='/'>JY Bookmark</Link>
           <Link href={didLogin ? '/api/auth/signout' : '/api/auth/signin'}>
-            {didLogin ? session.user?.name : 'Login'}
+            {didLogin ? `${session.user?.name}님` : 'Login'}
           </Link>
         </header>
         <div className='grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'>
