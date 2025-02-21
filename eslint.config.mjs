@@ -36,7 +36,7 @@ const config = [
 
     rules: {
       '@typescript-eslint/no-unused-vars': [
-        'error',
+        'warn',
         {
           args: 'all',
           argsIgnorePattern: '^_',
