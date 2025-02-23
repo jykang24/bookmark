@@ -1,7 +1,9 @@
-export default function SignupLayout({
+import { SessionProvider } from 'next-auth/react';
+
+export default async function SignupLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <>{children}</>;
+  return <SessionProvider>{children}</SessionProvider>;
 }

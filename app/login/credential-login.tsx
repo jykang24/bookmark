@@ -4,6 +4,8 @@ import { myLogin as login } from '@/actions/sign';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LogIn } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import { z } from '@/lib/i18n-zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,6 +27,17 @@ const FormSchema = z.object({
 type FormSchemaType = z.infer<typeof FormSchema>; //유틸리티타입처럼 자동으로타입 만들어줌
 
 export default function CredentialLogin() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // 로그인 페이지에 남아 있는 callbackUrl 정리
+    const callbackUrl = searchParams.get('callbackUrl');
+    if (callbackUrl?.includes('/login')) {
+      router.replace('/login'); // 로그인 페이지 URL 정리
+    }
+  }, [searchParams, router]);
+
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
