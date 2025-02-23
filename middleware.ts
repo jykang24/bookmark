@@ -27,4 +27,5 @@ export const config = {
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|robots.txt|images|api/auth|login|logout|api/regist|signup|withdraw|samples|$).*)',
   ],
+  //runtime: 'nodejs', // Edge 대신 Node.js 환경 사용
 };

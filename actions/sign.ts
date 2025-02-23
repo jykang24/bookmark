@@ -1,6 +1,6 @@
 'use server';
 
-import { compare, hash } from 'bcrypt';
+import { compare, hash } from 'bcryptjs';
 import { signIn, signOut } from '@/lib/auth';
 import prisma from '@/lib/db';
 
