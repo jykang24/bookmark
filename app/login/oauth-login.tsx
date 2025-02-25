@@ -9,7 +9,7 @@ export default function OAuthLogin() {
       <Button onClick={() => login('google')}>Google</Button>
       <Button onClick={() => login('github')}>Github</Button>
       <Button onClick={() => login('kakao')}>Kakao</Button>
-      <Button onClick={() => login('kakao')}>Naver</Button>
+      <Button onClick={() => login('naver')}>Naver</Button>
     </div>
   );
 }
