@@ -10,7 +10,7 @@ export default async function Login() {
 
   if (session && session !== undefined) {
     if (session.user.registRequired) {
-      alert('가입되지 않은 사용자입니다. 회원 가입 페이지로 이동합니다');
+      console.log('가입되지 않은 사용자입니다. 회원 가입 페이지로 이동합니다');
       redirect('/signup/agreement');
     }
     //로그인 후 홈으로 리다이렉트
