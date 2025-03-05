@@ -1,3 +1,4 @@
+import { SquareMinus, SquareX } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Mark from './Mark';
@@ -51,7 +52,7 @@ export default function Book({
   }, [markList]);
 
   return (
-    <div className='flex flex-col gap-4 bg-slate-200 p-2 rounded-sm'>
+    <div className='flex flex-col gap-4 bg-neutral-200 p-2 rounded-sm shadow-lg'>
       {/* {isEditingBook ? (
         <BookEditor toggleEditing={toggleBook} />
       ) : (
@@ -72,10 +73,16 @@ export default function Book({
           {name}
         </p>
       )} */}
-      <p className='text-center m-2' onClick={() => editBook(id)}>
+      <div className='flex ml-auto'>
+        <SquareMinus className='cursor-pointer' />
+        <SquareX className='cursor-pointer' onClick={() => deleteBook(id)} />
+      </div>
+      <p
+        className='inline-block text-center m-2 text-xl font-bold'
+        onClick={() => editBook(id)}
+      >
         {name}
       </p>
-      <Button onClick={() => deleteBook(id)}>Delete Book</Button>
 
       {markList.length > 0 ? (
         markList.map((mark) => (

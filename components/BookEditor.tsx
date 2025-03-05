@@ -1,4 +1,5 @@
 import { FormEvent, useRef } from 'react';
+import { Button } from './ui/button';
 
 type BookType = {
   id: number;
@@ -37,9 +38,9 @@ export default function BookEditor({ saveBookList, book, toggleBook }: Props) {
   return (
     <form
       id='container'
-      className='flex flex-col gap-4 p-2 bg-slate-200 rounded-sm'
+      className='flex flex-col gap-4 p-2 bg-green-100 rounded-sm shadow-md'
     >
-      <p className='text-center'>Book Editor</p>
+      <p className='text-center text-lg font-semibold p-4'>📖Book Editor</p>
 
       <input
         ref={inputRef}
@@ -53,17 +54,11 @@ export default function BookEditor({ saveBookList, book, toggleBook }: Props) {
           이동시 자동 삭제
         </label>
       </div>
-      <div className='flex justify-around'>
-        <button onClick={toggleBook} className='rounded-md bg-green-200 p-1'>
-          Close
-        </button>
-        <button
-          type='submit'
-          onClick={formSubmit}
-          className='rounded-md bg-blue-200 p-1'
-        >
+      <div className='flex justify-center gap-2'>
+        <Button type='submit' onClick={formSubmit}>
           Save
-        </button>
+        </Button>
+        <Button onClick={toggleBook}>Close</Button>
       </div>
     </form>
   );

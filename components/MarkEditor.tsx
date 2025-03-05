@@ -1,4 +1,5 @@
 import { fetchOG } from '@/actions/fetch';
+import { RotateCcw, Save, Send, X } from 'lucide-react';
 import { FormEvent, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -72,30 +73,35 @@ export default function MarkEditor({
   }, [markList]);
 
   return (
-    <form className='flex flex-col gap-4'>
-      URL
+    <form className='flex flex-col gap-12'>
       <div className='flex gap-2 justify-between'>
         <input
           type='text'
-          placeholder='URL...'
+          placeholder='저장할 URL을 입력해주세요'
           className='flex-1'
           ref={urlRef}
         />
-        <Button onClick={handleClick}>Fetch</Button>
+
+        <Button onClick={handleClick}>
+          <Send />
+        </Button>
       </div>
       <div className='flex gap-2 justify-end'>
-        <button onClick={toggleEditing} className='rounded-md bg-blue-200 p-1'>
-          Close
+        <button
+          onClick={toggleEditing}
+          className='rounded-md bg-neutral-300 p-1'
+        >
+          <X />
         </button>
-        <button type='reset' className='rounded-md bg-blue-200 p-1'>
-          Reset
+        <button type='reset' className='rounded-md bg-neutral-300 p-1'>
+          <RotateCcw />
         </button>
         <button
           onClick={formSubmit}
           type='submit'
-          className='rounded-md bg-blue-200 p-1'
+          className='rounded-md bg-neutral-300 p-1'
         >
-          Save
+          <Save />
         </button>
       </div>
     </form>
