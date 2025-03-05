@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## [Quickhub] Bookmark Project
 
-## Getting Started
+<b>누구나 북마크를 만들고 활용할 수 있어요.</b>
+<br>
+<p>
+*임시 저장과 자동 정리 기능 (추가예정)
+  -사용자가 북마크를 방문한 후에는 자동으로 제거되어 더 효율적이고 깔끔하게 관리할 수 있어요.
 
-First, run the development server:
+*협업 및 공유 기능 (추가예정)
+ -북마크를 단순히 개인적으로 저장하는 것을 넘어 팀이나 친구들과 북마크를 공유하고 협업에 활용해보세요.
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+ 
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 주요 기능
+### 회원가입 및 로그인 (Credentials, Oauth 방식)
+> 로그인하고 나만의 북마크를 만들고 저장해보세요.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+![image](https://github.com/user-attachments/assets/d3827a3d-844a-4394-81ed-af651a91d231)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+### 북마크 폴더 추가,삭제하기
+![image](https://github.com/user-attachments/assets/9a25675e-197e-4bfe-9ecb-91e750346a4f)
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 북마크 저장하기
+![image](https://github.com/user-attachments/assets/c9760a50-aad2-4269-99ce-1e9bac7cd50f)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 기술 스택
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Framework : Next.js 
+- Language : Javascript, Typescript
+- CSS : TailwindCSS
+- Build&Bundler : webpack, SWC 
+- Library
+- UI 컴포넌트 : shadcn-ui
+- 폼 관리 : react-hook-form
+- 입력값 검증 : zod
+- 비밀번호 해싱 : bcrypt.js
+- 토큰 생성 : uuid
+- html 파싱 : node-html-parser
+- 로그인 인증 처리 : next-auth
+- 패키지 매니저 : pnpm
+- ORM : Prisma
+- DB : MySQL
+- Infra : Docker 
+- Deploy : Vercel
+
