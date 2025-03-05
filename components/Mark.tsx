@@ -8,7 +8,7 @@ type Props = {
 };
 export default function Mark({ id, url, imgUrl, title, description }: Props) {
   return (
-    <div className='border-2 border-white bg-slate-200 flex gap-2 rounded-sm p-2'>
+    <div className='border-2 border-white bg-neutral-300 flex gap-2 rounded-sm p-2'>
       <img
         className='dark:invert justify-center'
         src={imgUrl} //TODO: not found img
@@ -16,14 +16,16 @@ export default function Mark({ id, url, imgUrl, title, description }: Props) {
         width={50}
         height={26}
       />
-      <div className='flex flex-col flex-grow'>
-        <p>
+      <div className='flex flex-col flex-grow h-12 justify-center overflow-hidden'>
+        <p className='truncate w-full sm:w-80 max-w-xs sm:max-w-md overflow-hidden'>
           <a href={url} target='_blank' rel='noopener noreferrer'>
             {title} 바로가기
           </a>
           {id}
         </p>
-        <p className='text-slate-600 truncate w-80'>{description}</p>
+        <p className='text-slate-600 truncate w-full sm:w-80 max-w-xs sm:max-w-md'>
+          {description}
+        </p>
       </div>
       {/* TODO: icon 클릭하면 mark 수정*/}
       <svg
