@@ -38,9 +38,9 @@ export default function BookEditor({ saveBookList, book, toggleBook }: Props) {
   return (
     <form
       id='container'
-      className='flex flex-col gap-4 p-2 bg-green-100 rounded-sm shadow-md'
+      className='flex flex-col gap-4 p-2 bg-green-100 rounded-sm shadow-md text-black dark:text-gray-700'
     >
-      <p className='text-center text-lg font-semibold p-4'>📖Book Editor</p>
+      <p className='text-center text-lg font-semibold  p-4'>📖Book Editor</p>
 
       <input
         ref={inputRef}

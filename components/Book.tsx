@@ -52,7 +52,7 @@ export default function Book({
   }, [markList]);
 
   return (
-    <div className='flex flex-col gap-4 bg-neutral-200 p-2 rounded-sm shadow-lg'>
+    <div className='flex flex-col gap-4 bg-neutral-200 text-black dark:text-gray-700 p-2 rounded-sm shadow-lg'>
       {/* {isEditingBook ? (
         <BookEditor toggleEditing={toggleBook} />
       ) : (
